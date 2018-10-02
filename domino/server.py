@@ -44,6 +44,7 @@ class Domino(object):
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
 		sock.bind((self.host, self.port))
+		print ('Starting domino on {0}:{1} ...'.format(self.host, self.port))
 
 		while 1:
 			sock.listen(0)

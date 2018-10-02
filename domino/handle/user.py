@@ -7,6 +7,7 @@
 from domino.data import DominoData
 from domino.handle.helpers import send_numeric, split_string_512
 from domino.mode import UserMode, ChanMode
+from domino.chan import Chan
 
 def PING(user, args):
 	if len(args) == 1:
@@ -106,3 +107,9 @@ def USER(user, args):
 			for l in user.server.motd:
 				send_numeric(372, [user.nick], ':- %s' % (l.strip()), user)
 			send_numeric(376, [user.nick], ':End of /MOTD command', user)
+
+
+			if len(user.server.config['auto_join']) >= 1:
+				for chan_str in user.server.config['auto_join']:
+					chan = Chan.create_or_get_chan(user, chan_str)
+					user.join(chan)

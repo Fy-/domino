@@ -110,24 +110,42 @@ class User(object):
 				print('SEND')
 				self.send(data)
 
+		del _relatives
+
 	def listen(self):
 		while self._alive:
-			data = self._conn.recv(512)
-			IRCProtocol.parse(data, self)
+			try:
+				data = self._conn.recv(512)
 
-			if not data or data == b'':
-				print('Error: No data?')
-				self.die()
+				assert data
+				IRCProtocol.parse(data, self)
+			except (UnicodeDecodeError, AssertionError, ConnectionResetError):
+				self.die('Peer, this bastard.')
 
+				
 		self._conn.close()
+
+
+	def die(self, reason=''):
+		print('### %s just died.' % (self))
+		self.send_relatives(':%s QUIT :%s' % (self, reason), False)
+			
+		for channel in self.channels:
+			channel.users.discard(self)
+
+		_relatives = self.relatives.copy()
+		for my_user in _relatives:
+			my_user.discard(self)
+
+		del _relatives
+
 		if self.nick in DominoData.users:
 			del DominoData.users[self.nick]
 
-	def die(self):
 		self._alive = False
 
 	@property
-	def alive(self):
+	def is_alive(self):
 		return self._alive
 
 	@property
