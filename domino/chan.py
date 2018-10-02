@@ -52,15 +52,23 @@ class Chan(object):
 			my_user.relatives.add(user)
 
 		self.send(':%s JOIN %s' % (user, self.name))
-		if len(self.users) == 1:
-			pass
-			#: on_create_channel
 
-		#: on_join_channel
+		if len(self.users) == 1:
+			if self.id in DominoData.callback['on_create_chan']:
+				for callback in DominoData.callback['on_create_chan'][self.id]:
+					callback(user, self)
+
+		if self.id in DominoData.callback['on_join_chan']:
+			for callback in DominoData.callback['on_join_chan'][self.id]:
+				callback(user, self)
 
 	def privmsg(self, user, data, cmd):
 		if self.can_talk(user):
 			self.send(':%s %s %s :%s' % (user, cmd, self.name, data), me=user)
+
+			if self.id in DominoData.callback['on_privmsg_chan']:
+				for callback in DominoData.callback['on_privmsg_chan'][self.id]:
+					callback(user, self, data)
 		else:
 			send_numeric(404, [user.nick, self.name], ':Cannot send to channel', user)
 

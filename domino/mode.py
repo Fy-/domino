@@ -142,7 +142,7 @@ class ChanMode(object):
 					if not target:
 						send_numeric(403, [user.nick, self.chan.name], ':No such nick/channel', user)
 					else:
-						if target.can(user, mode):
+						if self.can(user, mode):
 							changed = False
 							if action == '+':
 								if target not in self.data[mode]:

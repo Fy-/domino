@@ -12,18 +12,18 @@ from domino.mode import UserMode
 from domino.markov import construct_sentence
 
 class User(object):
-	def __init__(self, server, conn=None, ip=None, data={}):
+	def __init__(self, server, conn=None, ip=None, data={}, service=False):
 		self.server = server
 		if conn:
 			self._conn 	= conn
 			self._alive = True
 			self._ip 	= ip
 
-		self.username 	= data.get('username') or None
+		self.username 	= data.get('nick') or None
 		self.realname 	= data.get('realname') or None
-		self.service 	= data.get('service') or False
-		self.realhost	= data.get('realhost') or None
-		self.maskhost 	= data.get('maskhost') or None
+		self.service    = service
+		self.realhost	= data.get('virthost') or None
+		self.maskhost 	= data.get('virthost') or None
 		self.virthost   = data.get('virthost') or None
 
 		self.nick		= data.get('nick') or None
@@ -32,6 +32,7 @@ class User(object):
 		self.idle 		= self.created
 		self.welcomed 	= False
 		self.away 		= False
+		self.data_user  = None
 
 		self.relatives 	= set()
 		self.channels  	= set()
@@ -41,7 +42,11 @@ class User(object):
 
 
 		if self.nick:
-			DominoData.user[self.nick.lower()] = self
+			DominoData.users[self.nick.lower()] = self
+
+		if data.get('oper'):
+			self.modes.data['O'] = True
+
 
 	def update_hostname(self):
 		if not self.service:
@@ -96,13 +101,15 @@ class User(object):
 		if self.nick in DominoData.users:
 			del DominoData.users[self.nick]
 
+		if self.is_ready:
+			self.send_relatives(':%s NICK :%s' % (self, new_nick))
+		else:
+			self.send('PING :D%s' % int(time.time()))
+			
 		self.nick = new_nick
 		DominoData.users[new_nick.lower()] = self
 
-		if self.is_ready:
-			self.send_relatives(':%s NICK :%s' % (self, self.nick))
-		else:
-			self.send('PING :D%s' % int(time.time()))
+
 
 	def join(self, chan):
 		if chan not in self.channels:
@@ -124,7 +131,6 @@ class User(object):
 			self.channels.discard(channel)
 			chan.part(self)
 
-
 	def kick(self, source, channel, reason):
 		if chan  in self.channels:
 			self.channels.discard(channel)
@@ -134,41 +140,45 @@ class User(object):
 		if self.away:
 			send_numeric(301, [self.nick, target.nick], ':%s' % (target.away), self)
 
+		if target.nick.lower() in DominoData.callback['on_privmsg']:
+			for callback in DominoData.callback['on_privmsg'][target.nick.lower()]:
+				callback(self, data)
+
 		target.send(':%s %s %s :%s' % (self, cmd, target.nick, data))
 		
 	def send(self, data):
-		try:
-			if self._alive:
-				print ('>>> %s' % (data))
-				data += '\r\n'
+		if not self.service:
+			try:
+				if self._alive:
+					print ('>>> %s' % (data))
+					data += '\r\n'
 
-				self._conn.send(data.encode('utf-8'))
-		except (ConnectionResetError):
-			self.die('Peer, this bastard.')
+					self._conn.send(data.encode('utf-8'))
+			except (ConnectionResetError):
+				self.die('Peer, this bastard.')
 
 	def send_relatives(self, data, me=True):
 		_relatives = self.relatives.copy()
 		for relative in _relatives:
 			if me == True or relative != self:
 				relative.send(data)
-
-
 		del _relatives
 
 	def listen(self):
-		while self._alive:
-			try:
-				data = self._conn.recv(512)
-				assert data
-				
-			except (UnicodeDecodeError, AssertionError, ConnectionResetError):
-				self.die('Peer, this bastard.')
-				break
+		if not self.service:
+			while self._alive:
+				try:
+					data = self._conn.recv(512)
+					assert data
+					
+				except (UnicodeDecodeError, AssertionError, ConnectionResetError):
+					self.die('Peer, this bastard.')
+					break
 
-			
-			IRCProtocol.parse(data, self)
 				
-		self._conn.close()
+				IRCProtocol.parse(data, self)
+					
+			self._conn.close()
 
 	def quit(self, reason=''):
 		self.send('%s QUIT :%s' % (self, reason))
@@ -218,16 +228,22 @@ class User(object):
 	
 	@property
 	def is_ready(self):
+		if self.service:
+			return True
+
 		if self.nick == None or self.username == None or self.hostname == None:
 			return False
 		return True
 	
 	@property
 	def hostname(self):
+		if self.virthost:
+			return self.virthost.lower()
+
 		if self.modes.has('x'):
 			return self.maskhost.lower()
-		else:
-			return self.realhost.lower()
+	
+		return self.realhost.lower()
 
 
 	def __str__(self):

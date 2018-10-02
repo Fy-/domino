@@ -8,11 +8,14 @@ import datetime, ssl, socket
 from threading import Thread
 
 from domino.user import User
+from domino.data import DominoData
 from domino.markov import create_chain
+
 __version__ = '0.10.dev'
 
 class Domino(object):
 	def __init__(self, config):
+		print('[Domino] Welcome to domino-ircd')
 		self.get_config(config)
 
 	def get_config(self, config):
@@ -42,11 +45,15 @@ class Domino(object):
 		if config.get('hosts_txt'):
 			self.markov_chain = create_chain([config.get('hosts_txt')])
 
+	def init(self):
+		for data in DominoData.services:
+			User(self, data=data, service=True)
+
 	def run(self):
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
 		sock.bind((self.host, self.port))
-		print ('Starting domino on {0}:{1} ...'.format(self.host, self.port))
+		print ('[Domino] Starting domino on {0}:{1} ...'.format(self.host, self.port))
 
 		while 1:
 			sock.listen(0)

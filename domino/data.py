@@ -14,3 +14,27 @@ class DominoData(object):
 	chans = {}
 	hosts = {}
 	masked_hosts = {}
+
+	services = []
+
+	callback = {
+		'on_join_chan' : {},
+		'on_create_chan' : {},
+		'on_privmsg' : {},
+		'on_privmsg_chan' : {},
+		'server_ready' : []
+	}
+
+	@staticmethod
+	def add_callback(action, cb, key=False):
+		has_key = ['on_join_chan', 'on_create_chan', 'on_privmsg', 'on_privmsg_chan']
+
+		if action.lower() in DominoData.callback:
+			if isinstance(DominoData.callback[action.lower()], list):
+				DominoData.callback[action.lower()].append(cb)
+			elif isinstance(DominoData.callback[action.lower()], dict):
+				if key:
+					if key.lower() not in DominoData.callback[action.lower()]:
+						DominoData.callback[action.lower()][key.lower()] = []
+
+					DominoData.callback[action.lower()][key.lower()].append(cb)
