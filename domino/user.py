@@ -62,7 +62,7 @@ class User(object):
 				try:
 					_host = self.realhost.split('.')
 					endhost = '%s.%s' % (_host[len(_host)-2], _host[len(_host)-1])
-					start = construct_sentence(self.server.markov_chain, word_count=5, slug=True)
+					start = construct_sentence(self.server.markov_chain, word_count=4, slug=True)
 
 					self.maskhost = '%s.%s' % (start, endhost)
 					DominoData.masked_hosts[self._ip[0]] = self.maskhost
@@ -80,7 +80,7 @@ class User(object):
 	def update_idle(self):
 		self.idle = int(time.time())
 
-	def update_ping(self, arg):
+	def update_ping(self, arg=''):
 		self.ping = int(time.time())
 		self.send('PONG %s :%s' % (self.server.name, arg))
 
@@ -225,9 +225,9 @@ class User(object):
 	@property
 	def hostname(self):
 		if self.modes.has('x'):
-			return self.maskhost
+			return self.maskhost.lower()
 		else:
-			return self.realhost
+			return self.realhost.lower()
 
 
 	def __str__(self):

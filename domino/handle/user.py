@@ -15,10 +15,14 @@ def PING(user, args):
 	if len(args) == 1:
 		user.update_ping(args[0])
 
+def PONG(user, args):
+	user.update_ping()
+
 def QUIT(user, args):
-	if len(args) == 2:
+	if len(args) == 1:
 		user.quit(args[1])
 		return
+		
 	user.quit('...')
 	
 def NICK(user, args):
@@ -96,8 +100,8 @@ def MODE(user, args):
 		
 
 def WHOIS(user, args):
-	if len(args) != 1:
-		send_numeric(461, [user.nick, 'WHOIS'], ':Not enough parameters')
+	if len(args) not in [1,2]:
+		send_numeric(461, [user.nick, 'WHOIS'], ':Not enough parameters', user)
 		return
 
 	target = DominoData.users.get(args[0].lower())
@@ -172,3 +176,13 @@ def USER(user, args):
 			for chan_str in user.server.config['auto_join']:
 				chan = Chan.create_or_get_chan(user, chan_str)
 				user.join(chan)
+
+def ISON(user, args):
+	user_list = ''
+	print(args)
+	for user_str in args:
+		_user = DominoData.users.get(user_str.lower())
+		if _user:
+			user_list += ' ' + _user.nick
+
+	send_numeric(303, [user.nick], ':%s' % (user_list.strip()), user)

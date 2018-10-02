@@ -124,6 +124,10 @@ class Chan(object):
 		del _users
 
 	@property
+	def count(self):
+		return len(self.users)
+	
+	@property
 	def user_list(self):
 		user_list = ''
 
@@ -132,7 +136,7 @@ class Chan(object):
 			user_list += ' ' + self.modes.get_prefix(my_user) + my_user.nick 
 		del _users
 
-		return user_list
+		return user_list.strip(' ')
 
 	def __str__(self):
 		return self.name

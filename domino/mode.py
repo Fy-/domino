@@ -103,6 +103,9 @@ class ChanMode(object):
 		return self.data.get(mode)
 
 	def send(self, user):
+		send_numeric(324, [user.nick, self.chan.name, self.__str__()], '', user)
+
+	def __str__(self):
 		str_modes = '+'
 		args = ''
 		for mode, value in self.data.items():
@@ -110,8 +113,7 @@ class ChanMode(object):
 				str_modes += mode
 			elif isinstance(value, str):
 				args += str(value)
-
-		send_numeric(324, [user.nick, self.chan.name, str_modes, args], '', user)
+		return '%s %s' % (str_modes, args)
 
 	def add(self, user, args):
 		modes = list(args[1])

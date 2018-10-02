@@ -14,4 +14,3 @@ class DominoData(object):
 	chans = {}
 	hosts = {}
 	masked_hosts = {}
-

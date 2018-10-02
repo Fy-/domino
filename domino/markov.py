@@ -13,6 +13,7 @@ def create_chain(file_paths):
 	for path in file_paths:
 		with open(path) as file:
 			for line in file:
+				line = line.strip()
 				for current_word in line.split():
 					if current_word != "":
 						markov_chain.setdefault((word1, word2), []).append(current_word)
