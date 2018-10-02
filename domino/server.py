@@ -36,7 +36,7 @@ class Domino(object):
 		self.version = 'Domino %s' % (__version__)
 		self.created = datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")
 		if config.get('motd'):
-			with open(config['motd']) as f:
+			with open(config['motd'], encoding='utf-8') as f:
 				self.motd = f.readlines()
 
 
