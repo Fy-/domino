@@ -8,6 +8,7 @@ import time
 from domino.parser import IRCProtocol
 from domino.handle.helpers import send_numeric
 from domino.data import DominoData
+from domino.mode import UserMode
 
 class User(object):
 	def __init__(self, server, conn=None, ip=None, data={}):
@@ -27,8 +28,9 @@ class User(object):
 		self.welcomed 	= False
 		self.away 		= False
 
-		self.relatives = set()
-		self.channels  = set()
+		self.relatives 	= set()
+		self.channels  	= set()
+		self.modes 	 	= UserMode(self)
 
 		self.relatives.add(self)
 
@@ -45,6 +47,13 @@ class User(object):
 		self.ping = int(time.time())
 		self.send('PONG %s :%s' % (self.server.name, arg))
 
+	def update_away(self, value):
+		if not value:
+			self.away = False
+			send_numeric(305, [self.nick], ':You are no longer marked as being away', self)
+		else:
+			self.away = value
+			send_numeric(306, [self.nick], ':You have been marked as being away')
 
 	def join(self, chan):
 		if chan not in self.channels:
@@ -56,6 +65,8 @@ class User(object):
 				send_numeric(332, [self.nick, chan], ':%s' % (chan.topic), self)
 			else:
 				send_numeric(331, [self.nick, chan], ':No topic is set', self)
+
+			chan.modes.send(self)
 
 			chan.names(self)
 

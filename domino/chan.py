@@ -8,6 +8,7 @@ import time
 
 from domino.data import DominoData
 from domino.handle.helpers import send_numeric, split_string_512
+from domino.mode import ChanMode
 
 class Chan(object):
 	@staticmethod
@@ -28,11 +29,20 @@ class Chan(object):
 		self.topic 		= ''
 		self.created 	= int(time.time())
 		self.creator 	= creator
+		self.modes 		= ChanMode(self)
 
 		DominoData.chans[self.id] = self
+		if creator and not self.modes.has('r'):
+			self.modes.data['q'].add(creator)
+			self.modes.data['a'].add(creator)
+			self.modes.data['o'].add(creator)
+			self.modes.data['h'].add(creator)
+			self.modes.data['v'].add(creator)
 
 	def update_topic(self, user, topic):
-		pass
+		if self.modes.has('t') == False or self.modes.can(user, 'o'):
+			self.topic = topic
+			self.send(':%s TOPIC %s :%s' % (user, self.name, self.topic))
 	
 	def join(self, user):
 		user.relatives |= self.users
@@ -42,7 +52,6 @@ class Chan(object):
 			my_user.relatives.add(user)
 
 		self.send(':%s JOIN %s' % (user, self.name))
-
 		if len(self.users) == 1:
 			pass
 			#: on_create_channel
@@ -86,13 +95,16 @@ class Chan(object):
 			send_numeric(353, [], '%s = %s :%s' % (user.nick, self.name, data.strip(' ')), user)
 		send_numeric(366, [user.nick, self.name], ':End of /NAMES list.', user)
 
-
 	def who(self, user):
 		for my_user in self.users:
 			send_numeric(
 				352, 
-				[user.nick, self.name, user.hostname, user.server.name, user.nick, 'H' if not user.away else 'G'], 
-				':%s' % (user.realname),
+				[
+					user.nick, self.name, my_user.hostname, 
+					my_user.server.name, my_user.nick, 
+					'H%s' % (self.modes.get_prefix(my_user)) if not user.away else 'G%s'  % (self.modes.get_prefix(my_user))
+				], 
+				':0 %s' % (my_user.realname),
 				user
 			)
 		send_numeric(315, [user.nick, self.name], ':End of /WHO list.', user)
@@ -117,8 +129,7 @@ class Chan(object):
 
 		_users = self.users.copy()
 		for my_user in _users:
-			user_list += ' ' +  my_user.nick #: @TODO: add prefix
-
+			user_list += ' ' + self.modes.get_prefix(my_user) + my_user.nick 
 		del _users
 
 		return user_list

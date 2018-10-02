@@ -5,8 +5,8 @@
 	:license: BSD, see LICENSE for more details.
 """
 from domino.data import DominoData
-from domino.chan import Chan
 from domino.handle.helpers import send_numeric, split_string_512
+from domino.mode import UserMode, ChanMode
 
 def PING(user, args):
 	if len(args) == 1:
@@ -23,46 +23,6 @@ def NICK(user, args):
 	else:
 		user.update_nick(args[0])
 
-def JOIN(user, args):
-	if len(args) != 1:
-		send_numeric(461, [user.nick, 'JOIN'], ':Not enough parameters')
-
-	def _join(user, chan_str):
-		chan = Chan.create_or_get_chan(user, chan_str)
-		if not chan:
-			send_numeric(403, [user.nickname, chan_str], ':No such nick/channel', user)
-		else:
-			user.join(chan)
-
-	if '#' not in args[0]:
-		send_numeric(403, [user.nickname, chan_str], ':No such nick/channel', user)
-	else:
-		if ',' in args[0]:
-			for chan_str in args[0].split(','):
-				_join(user, chan_str)
-		else:
-			_join(user, args[0])
-
-
-def PART(user, args):
-	if len(args) != 1:
-		send_numeric(461, [user.nick, 'PART'], ':Not enough parameters')
-
-	def _part(user, chan_str):
-		chan = Chan.create_or_get_chan(user, chan_str)
-		if not chan:
-			send_numeric(403, [user.nickname, chan_str], ':No such nick/channel', user)
-		else:
-			user.part(chan)
-			
-	if '#' not in args[0]:
-		send_numeric(403, [user.nickname, chan_str], ':No such nick/channel', user)
-	else:
-		if ',' in args[0]:
-			for chan_str in args[0].split(','):
-				_part(user, chan_str)
-		else:
-			_part(user, args[0])
 
 def NOTICE(user, args):
 	PRIVMSG(user, args, 'NOTICE')
@@ -90,26 +50,31 @@ def PRIVMSG(user, args, command='PRIVMSG'):
 				user.privmsg(target, args[1], command)
 
 
-def NAMES(user, args):
-	if len(args) != 1:
-		send_numeric(461, [user.nick, 'NAMES'], ':Not enough parameters')
+def AWAY(user, args):
+	if len(args) == 1:
+		user.update_away(args[0])
+	elif len(args) == 0:
+		user.update_away(False)
 
-	chan = DominoData.chans.get(args[0].lower())
-	if not chan:
-		send_numeric(401, [user.nickname, chan_str], ':No such nick/channel', user)
-	else:
-		chan.names()
 
-def WHO(user, args):
-	if len(args) != 1:
-		send_numeric(461, [user.nick, 'WHO'], ':Not enough parameters')
-
+def MODE(user, args):
 	if '#' in args[0]:
 		chan = DominoData.chans.get(args[0].lower())
-		if not chan:
-			send_numeric(401, [user.nickname, chan_str], ':No such nick/channel', user)
+		if chan:
+			if len(args) == 2:
+				chan.modes.send()
+			elif len(args) == 3:
+				chan.modes.add(user, args)
 		else:
-			chan.who(user)
+			send_numeric(401, [user.nick, args[0]], ':No such nick/channel', user)
+	else:
+		user = DominoData.users.get(args[0].lower())
+		if user:
+			if len(args) == 2:
+				user.modes.send()
+		else:
+			send_numeric(401, [user.nick, args[0]], ':No such nick/channel', user)
+
 
 def USER(user, args):
 	if len(args) != 4:
@@ -128,8 +93,8 @@ def USER(user, args):
 			send_numeric(1, [user.nick], ':Welcome to %s %s' % (user.server.name, user.nick), user)
 			send_numeric(2, [user.nick], ':Your host is "%s", running version %s' % (user.server.name, user.server.version), user)
 			send_numeric(3, [user.nick], ':This server was created on %s' % (user.server.created), user)
-			send_numeric(4, [user.nick], ':%s %s %s %s' % (user.server.name, user.server.version, 'ADHLNOQSWxrZ', 'AmrnvhoaqbeOlst'), user)
-			options_txt = 'CHANTYPES=# CHARSET=utf-8 PREFIX=(qaohv)~&@%+ NICKLEN=50 CHANNELLEN=50 TOPICLEN=390 AWAYLEN=160'
+			send_numeric(4, [user.nick], ':%s %s %s %s' % (user.server.name, user.server.version, UserMode.concat(), ChanMode.concat()), user)
+			options_txt = 'CHANTYPES=# CHARSET=utf-8 PREFIX=({0}){1} NICKLEN=50 CHANNELLEN=50 TOPICLEN=390 AWAYLEN=160'.format(ChanMode.concat_modes(), ChanMode.concat_symbols())
 			send_numeric(5, [user.nick], ':%s %s NETWORK=%s :Are supported by this server' % (user.nick, options_txt, user.server.name), user)
 			
 			#: Stats
