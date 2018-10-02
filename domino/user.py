@@ -60,10 +60,9 @@ class User(object):
 				self.maskhost = DominoData.masked_hosts.get(self._ip[0])
 			else:
 				try:
-					endhost = self.realhost.split('.', 2)[2]
-					start = construct_sentence(self.server.markov_chain, word_count=4, slug=True)
-					print(start)
-					print(endhost)
+					_host = self.realhost.split('.')
+					endhost = '%s.%s' % (_host[len(_host)-2], _host[len(_host)-1])
+					start = construct_sentence(self.server.markov_chain, word_count=5, slug=True)
 
 					self.maskhost = '%s.%s' % (start, endhost)
 					DominoData.masked_hosts[self._ip[0]] = self.maskhost

@@ -4,7 +4,7 @@ import regex as re
 from unidecode import unidecode
 
 
-_punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
+_punct_re = re.compile(r'[\t !":\!#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
 def create_chain(file_paths):
 	markov_chain = {}
