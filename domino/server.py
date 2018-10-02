@@ -8,7 +8,7 @@ import datetime, ssl, socket
 from threading import Thread
 
 from domino.user import User
-
+from domino.markov import create_chain
 __version__ = '0.10.dev'
 
 class Domino(object):
@@ -39,6 +39,8 @@ class Domino(object):
 			with open(config['motd'], encoding='utf-8') as f:
 				self.motd = f.readlines()
 
+		if config.get('hosts_txt'):
+			self.markov_chain = create_chain([config.get('hosts_txt')])
 
 	def run(self):
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,4 +53,5 @@ class Domino(object):
 			(conn, ip) = sock.accept()
 
 			user = User(server=self, conn=conn, ip=ip)
+			user.update_hostname()
 			Thread(target = user.listen).start()

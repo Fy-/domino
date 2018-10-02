@@ -4,11 +4,12 @@
 	~~~~~~~~~~~~~~~~
 	:license: BSD, see LICENSE for more details.
 """
-import time
+import time, socket, hashlib
 from domino.parser import IRCProtocol
 from domino.handle.helpers import send_numeric
 from domino.data import DominoData
 from domino.mode import UserMode
+from domino.markov import construct_sentence
 
 class User(object):
 	def __init__(self, server, conn=None, ip=None, data={}):
@@ -20,6 +21,10 @@ class User(object):
 
 		self.username 	= data.get('username') or None
 		self.realname 	= data.get('realname') or None
+		self.service 	= data.get('service') or False
+		self.realhost	= data.get('realhost') or None
+		self.maskhost 	= data.get('maskhost') or None
+		self.virthost   = data.get('virthost') or None
 
 		self.nick		= data.get('nick') or None
 		self.ping 		= int(time.time())
@@ -34,11 +39,44 @@ class User(object):
 
 		self.relatives.add(self)
 
-		self.send(':%s NOTICE * :*** Looking up your hostname...' % (self.server.name))
-		self.send(':%s NOTICE * :*** Found your hostname...' % (self.server.name))
 
 		if self.nick:
 			DominoData.user[self.nick.lower()] = self
+
+	def update_hostname(self):
+		if not self.service:
+			self.send(':%s NOTICE * :*** Looking up your hostname...' % (self.server.name))
+			if DominoData.hosts.get(self._ip[0]):
+				self.realhost = DominoData.hosts.get(self._ip[0])
+			else:
+				try:
+					self.realhost = socket.gethostbyaddr(self._ip[0])[0]
+					DominoData.hosts[self._ip[0]] = self.realhost
+
+				except:
+					self.realhost = self._ip[0]
+
+			if DominoData.masked_hosts.get(self._ip[0]):
+				self.maskhost = DominoData.masked_hosts.get(self._ip[0])
+			else:
+				try:
+					endhost = self.realhost.split('.', 2)[2]
+					start = construct_sentence(self.server.markov_chain, word_count=4, slug=True)
+					print(start)
+					print(endhost)
+
+					self.maskhost = '%s.%s' % (start, endhost)
+					DominoData.masked_hosts[self._ip[0]] = self.maskhost
+				except:
+					self.maskhost = hashlib.new(
+						'sha512', 
+						self.realhost.encode('utf-8')
+					).hexdigest()[:len(self.realhost.encode('utf-8'))] + self.server.config['host_mask']
+
+
+
+			self.send(':%s NOTICE * :*** Found your hostname...' % (self.server.name))
+			self.send('PING :D%s' % int(time.time()))
 
 	def update_idle(self):
 		self.idle = int(time.time())
@@ -65,7 +103,7 @@ class User(object):
 		if self.is_ready:
 			self.send_relatives(':%s NICK :%s' % (self, self.nick))
 		else:
-			self.send('PING :P%s' % int(time.time()))
+			self.send('PING :D%s' % int(time.time()))
 
 	def join(self, chan):
 		if chan not in self.channels:
@@ -161,7 +199,7 @@ class User(object):
 			del _relatives
 
 			
-			if self.nick.lower() in DominoData.users:	
+			if self.nick and self.nick.lower() in DominoData.users:	
 				del DominoData.users[self.nick.lower()]
 
 		
@@ -177,9 +215,7 @@ class User(object):
 	def is_registered(self):
 		return self.modes.has('r')
 
-	@property
-	def hostname(self):
-		return self._ip[0]
+
 	
 	@property
 	def is_ready(self):
@@ -187,9 +223,16 @@ class User(object):
 			return False
 		return True
 	
-	
+	@property
+	def hostname(self):
+		if self.modes.has('x'):
+			return self.maskhost
+		else:
+			return self.realhost
+
+
 	def __str__(self):
 		if self.is_ready:
 			return '%s!%s@%s' % (self.nick, self.username, self.hostname)
 		else:
-			return 'Anonymous!Anonymous@%s' % (self._ip)
+			return 'Anonymous!Anonymous@%s' % (self._ip[0])

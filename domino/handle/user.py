@@ -15,6 +15,12 @@ def PING(user, args):
 	if len(args) == 1:
 		user.update_ping(args[0])
 
+def QUIT(user, args):
+	if len(args) == 2:
+		user.quit(args[1])
+		return
+	user.quit('...')
+	
 def NICK(user, args):
 	if len(args) != 1:
 		send_numeric(461, [user.nick, 'NICK'], ':Not enough parameters')
