@@ -11,6 +11,7 @@ import gevent
 import gevent.server
 import gevent.monkey
 import gevent.pool
+from gevent import Greenlet
 gevent.monkey.patch_all()
 
 from domino.user import User
@@ -56,6 +57,28 @@ class Domino(object):
 		for data in DominoData.services:
 			User(self, data=data, service=True)
 
+	def update_all(self):
+		while 1:
+			print('		- update_all - check pings and timeouts...')
+
+			_users = [
+				user for user in DominoData.users.values()
+				if user.service == False and user.is_ready == True and (time.time() - user.ping) > self.ping_timeout
+			]
+			for user in _users:
+				user.die('Ping timeout: {0}'.format(int(time.time() - user.ping)))
+
+			half_timeout = self.ping_timeout / 2.0
+
+			_users = [
+				user for user in DominoData.users.values()
+				if user.service == False and user.is_ready == True and (time.time() - user.ping) > half_timeout
+			]
+			for user in _users:
+				user.send('PING :%s' % (self.name))
+
+			gevent.sleep(20)
+
 	def handle(self, sock, addr):
 		fileobj = sock.makefile('rbwb')
 		user = User(server=self, conn=[sock, fileobj], ip=addr)
@@ -75,6 +98,9 @@ class Domino(object):
 
 	def run(self):
 		print ('[Domino] Starting domino on {0}:{1} ...'.format(self.host, self.port))
+
+		gevent.Greenlet.spawn(self.update_all)
+
 		self.pool = gevent.pool.Pool(10000)
 		self.server = gevent.server.StreamServer((self.host, self.port), self.handle, spawn=self.pool)
 		self.server.serve_forever()
