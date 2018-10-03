@@ -59,8 +59,6 @@ def PRIVMSG(user, args, command='PRIVMSG'):
 			return
 
 		chan.privmsg(user, args[1], command)
-		#: on_chan_privmsg
-			
 	else:
 		target = DominoData.users.get(args[0].lower())
 		if not target:

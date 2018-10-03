@@ -77,7 +77,7 @@ class Domino(object):
 				if user.service == False and user.is_ready == True and (time.time() - user.ping) > half_timeout
 			]
 			for user in _users:
-				user.send('PING :%s' % (self.name))
+				user.send('PING :D%s' % int(time.time()))
 
 			gevent.sleep(20)
 
@@ -89,7 +89,7 @@ class Domino(object):
 			line = fileobj.readline()
 
 			if not line:
-				print('killed no line')
+				print('######### killed no line #########')
 				user.die('Peer.')
 			else:
 				IRCProtocol.parse(line, user)

@@ -18,7 +18,7 @@ class IRCProtocol(object):
 				try:
 					text = bytes.decode('cp1252')
 				except:
-					print ('ERROR decoding bytes: %s' % (bytes))
+					print ('######### ERROR decoding bytes: %s' % (bytes))
 					
 		return text
 

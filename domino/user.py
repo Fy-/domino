@@ -86,6 +86,7 @@ class User(object):
 
 	def update_idle(self):
 		self.idle = int(time.time())
+		self.ping = int(time.time())
 
 	def update_ping(self, arg=''):
 		self.ping = int(time.time())
@@ -169,7 +170,7 @@ class User(object):
 
 			self._alive = False
 
-			print('### DEATH: %s just died.' % (self))
+			print('######### DEATH #########: %s just died.' % (self))
 
 			for channel in self.channels:
 				channel.users.discard(self)
