@@ -143,10 +143,13 @@ class User(object):
 		
 	def send(self, data):
 		if not self.service and self.is_alive:
-			print('>>> %s' % (data))
-			data += '\n'
-			self._conn[1].write(data.encode('utf-8'))
-			self._conn[1].flush()
+			try:
+				print('>>> %s' % (data))
+				data += '\n'
+				self._conn[1].write(data.encode('utf-8'))
+				self._conn[1].flush()
+			except:
+				self.die('Rage quit...')
 
 	def send_relatives(self, data, me=True):
 		_relatives = self.relatives.copy()
