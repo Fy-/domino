@@ -12,7 +12,6 @@ from deadpool.chanserv import DeadpoolChan
 from deadpool.nickserv import DeadpoolUser
 
 def operserv_privmsg(user, args):
-	data = args
 	args = args.split(' ')
 	args[0] = args[0].lower()
 
@@ -20,7 +19,7 @@ def operserv_privmsg(user, args):
 
 	if not user.is_oper:
 		operserv.privmsg(user, 'Enough! You are, all of you are beneath me! I am a god, you dull creature, and I will not be bullied ... YOU\'RE NOT A GOD HERE!', 'NOTICE')
-		return data
+		return
 
 	if args[0] == 'init_db':
 		Base.metadata.create_all(engine)
@@ -31,4 +30,4 @@ def operserv_privmsg(user, args):
 			_user.modes.send()
 			operserv.privmsg(_user, 'Now if you\'ll excuse me, I have to destroy your database.		(db wipe - use /msg nickserv help)', 'NOTICE')
 
-	return data
+	return

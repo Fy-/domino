@@ -9,7 +9,7 @@ from deadpool.nickserv import nickserv_privmsg
 from deadpool.operserv import operserv_privmsg
 from deadpool.chanserv import DeadpoolChan, chanserv_privmsg, chanserv_on_create, botserv_privmsg
 
-from deadpool.db import Base, Session
+from deadpool.db import Base, session
 
 class Deadpool(object):
 	def __init__(self):
@@ -59,6 +59,7 @@ class Deadpool(object):
 		except:
 			channels = []
 
+		print(channels)
 		for chan in channels:
 			domi.add_callback('on_create_chan', chanserv_on_create, key=chan.id)
 			if chan.bot != None:

@@ -29,7 +29,6 @@ class DeadpoolUser(Base):
 	password = synonym('_password', descriptor=property(_get_password, _set_password))
 
 def nickserv_privmsg(user, args):
-	data = args
 	args = args.split(' ')
 	args[0] = args[0].lower()
 
@@ -38,7 +37,7 @@ def nickserv_privmsg(user, args):
 	def _ghost(user, args):
 		if len(args) != 3:
 			nickserv.privmsg(user, 'GHOST	/msg nickserv ghost <nick> <pass>	Kill someone with your nickname.', 'NOTICE')
-			return data
+			return
 
 		_user = session.query(DeadpoolUser).filter(DeadpoolUser.nick == args[1].lower()).first()
 		to_kill = domi.users.get(args[1].lower())
@@ -46,15 +45,15 @@ def nickserv_privmsg(user, args):
 			to_kill.kill(user, 'Killed by a bot. FML.')
 			user.update_nick(args[1])
 			nickserv.privmsg(user, 'Well done. %s has been killed.' % (args[1]), 'NOTICE')
-			return data
+			return
 
 		nickserv.privmsg(user, 'GHOST	Incorrect password (or did you try to kill yourself?).', 'NOTICE')
-		return data
+		return
 
 	def _identify(user, args):
 		if len(args) != 2:
 			nickserv.privmsg(user, 'IDENTIFY	/msg nickserv identify <pass>	Identify yourself.', 'NOTICE')
-			return data
+			return
 
 		_user = session.query(DeadpoolUser).filter(DeadpoolUser.nick == user.nick.lower()).first()
 		if _user and check_password_hash(_user.password, args[1]):
@@ -62,26 +61,26 @@ def nickserv_privmsg(user, args):
 			user.modes.data['r'] = True
 			user.data_user = user
 			user.modes.send()
-			return data
+			return
 
 		nickserv.privmsg(user, 'IDENTIFY	Incorrect password. Nice try.', 'NOTICE')
-		return data
+		return
 
 	def _register(user, args):
 		if len(args) != 3:
 			nickserv.privmsg(user, 'REGISTER	/msg nickserv register <pass> <mail>	Register your current nickname', 'NOTICE')
-			return data
+			return
 
 		exist = session.query(DeadpoolUser).filter(DeadpoolUser.nick == user.nick.lower()).first()
 		if exist:
 			nickserv.privmsg(user, 'REGISTER	This nickname is already registered.', 'NOTICE')
-			return data
+			return
 
 		_user = DeadpoolUser(nick=user.nick.lower(), password=args[1], email=args[2]) #: @TODO: check email
 		session.add(_user)
 		nickserv.privmsg(user, 'REGISTER	Well played. You can now use /msg nickserv identify <pass>', 'NOTICE')
 		session.commit()
-		return data
+		return
 
 	def _help(user, args):
 		nickserv.privmsg(user, 'NickServ allows you to register a nickname.', 'NOTICE')
@@ -90,7 +89,7 @@ def nickserv_privmsg(user, args):
 		nickserv.privmsg(user, '	IDENTIFY	/msg nickserv identify <pass>			Identify yourself.', 'NOTICE')
 		nickserv.privmsg(user, '	REGISTER	/msg nickserv register <pass> <mail>	Register your current nickname', 'NOTICE')
 		nickserv.privmsg(user, '	', 'NOTICE')
-		return data
+		return
 
 	if args[0] == 'register':
 		_register(user, args)
@@ -102,4 +101,4 @@ def nickserv_privmsg(user, args):
 		_help(user, args)
 	else:
 		nickserv.privmsg(user, 'Donde esta la biblioteca ?     /msg nickserv help', 'NOTICE')
-		return data
+		return
