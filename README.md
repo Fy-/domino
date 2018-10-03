@@ -11,6 +11,9 @@ py run.py #: edit config dict (oper password with werkzeug.security.generate_pas
 
 ## services
 ```
+IF YOU ARE IRC OPERATOR:
+/msg loki init_db     Create sqlite database.
+
 -NickServ-  NickServ allows you to register a nickname.
 -NickServ- 	GHOST     /msg nickserv ghost <nick> <pass>     Kill someone with your nickname.
 -NickServ- 	IDENTIFY  /msg nickserv identify <pass>         Identify yourself.
