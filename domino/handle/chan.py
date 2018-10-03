@@ -99,4 +99,3 @@ def TOPIC(user, args):
 			send_numeric(331, [user.nick, chan], ':No topic is set', user)
 	else:
 		send_numeric(461, [user.nick, 'TOPIC'], ':Not enough parameters',  user)
-
