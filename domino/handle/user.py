@@ -20,7 +20,7 @@ def PONG(user, args):
 
 def QUIT(user, args):
 	if len(args) == 1:
-		user.quit(args[1])
+		user.quit(args[0])
 		return
 		
 	user.quit('...')
@@ -119,8 +119,6 @@ def WHOIS(user, args):
 	send_numeric(379, [user.nick, target.nick], ':is using modes %s' % (target.modes), user)
 
 	if len(user.channels) > 0:
-
-
 		send_numeric(
 			319,
 			[user.nick, target.nick],
@@ -128,6 +126,11 @@ def WHOIS(user, args):
 			user
 		)
 
+	if target.away:
+		send_numeric(301, [user.nick, target.nick], ':%s' % (target.away), user)
+
+	if target.modes.has('B'):
+		send_numeric(335, [user.nick, target.nick], ':is a Bot on %s' % (user.server.name), user)
 	if target.is_oper:
 		send_numeric(313, [user.nick, target.nick], ':✩✩✩ IRC operator, show some respect! ✩✩✩', user)
 
@@ -138,6 +141,15 @@ def WHOIS(user, args):
 	send_numeric(317, [user.nick, target.nick, (int(time.time()) - target.idle), target.created], ':seconds idle, signon time', user)
 	send_numeric(312, [user.nick, target.nick, target.server.name], ':%s' % (user.server.name), user)
 	send_numeric(318, [user.nick, target.nick], ':End of /WHOIS list.', user)
+
+def USERHOST(user, args):
+	user_list = ''
+	for user_str in args:
+		_user = DominoData.users.get(user_str.lower())
+		if _user:
+			user_list += ' %s=%s' % (_user.nick, _user.userhost())
+
+	send_numeric(302, [user.nick], ':%s' % (user_list.strip()), user)
 
 def USER(user, args):
 	if len(args) != 4:
@@ -179,7 +191,6 @@ def USER(user, args):
 
 def ISON(user, args):
 	user_list = ''
-	print(args)
 	for user_str in args:
 		_user = DominoData.users.get(user_str.lower())
 		if _user:

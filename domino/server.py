@@ -59,6 +59,10 @@ class Domino(object):
 			sock.listen(0)
 			(conn, ip) = sock.accept()
 
+			if ip[0] in self.config.get('back_list'):
+				conn.close()
+				continue
+
 			user = User(server=self, conn=conn, ip=ip)
 			user.update_hostname()
 			Thread(target = user.listen).start()

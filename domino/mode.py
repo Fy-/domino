@@ -14,6 +14,7 @@ class UserMode(object):
 		'W' : False, 	#: Wallops. Recieve connect, disconnect and traceback notices.
 		'x' : True, 	#: Masked hostname. Hides the users hostname or IP address from other users.
 		'r' : False,	#: Registered User
+		'B' : False, 	#: Bot
 	}
 
 	def __init__(self, user):

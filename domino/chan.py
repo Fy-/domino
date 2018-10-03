@@ -53,6 +53,15 @@ class Chan(object):
 
 		self.send(':%s JOIN %s' % (user, self.name))
 
+		send_numeric(329, [user.nick, self, self.created], '', user)
+		if self.topic:
+			send_numeric(332, [user.nick, self], ':%s' % (self.topic), user)
+		else:
+			send_numeric(331, [user.nick, self], ':No topic is set', user)
+
+		self.modes.send(user)
+		self.names(user)
+		
 		if len(self.users) == 1:
 			if self.id in DominoData.callback['on_create_chan']:
 				for callback in DominoData.callback['on_create_chan'][self.id]:
@@ -61,6 +70,8 @@ class Chan(object):
 		if self.id in DominoData.callback['on_join_chan']:
 			for callback in DominoData.callback['on_join_chan'][self.id]:
 				callback(user, self)
+
+
 
 	def privmsg(self, user, data, cmd):
 		if self.can_talk(user):

@@ -40,6 +40,8 @@ class User(object):
 
 		self.relatives.add(self)
 
+		if self.service:
+			self.modes.data['B'] = True
 
 		if self.nick:
 			DominoData.users[self.nick.lower()] = self
@@ -95,7 +97,7 @@ class User(object):
 			send_numeric(305, [self.nick], ':You are no longer marked as being away', self)
 		else:
 			self.away = value
-			send_numeric(306, [self.nick], ':You have been marked as being away')
+			send_numeric(306, [self.nick], ':You have been marked as being away', self)
 
 	def update_nick(self, new_nick):
 		if self.nick in DominoData.users:
@@ -105,10 +107,9 @@ class User(object):
 			self.send_relatives(':%s NICK :%s' % (self, new_nick))
 		else:
 			self.send('PING :D%s' % int(time.time()))
-			
+
 		self.nick = new_nick
 		DominoData.users[new_nick.lower()] = self
-
 
 
 	def join(self, chan):
@@ -116,19 +117,9 @@ class User(object):
 			self.channels.add(chan)
 			chan.join(self)
 
-			send_numeric(329, [self.nick, chan, chan.created], '', self)
-			if chan.topic:
-				send_numeric(332, [self.nick, chan], ':%s' % (chan.topic), self)
-			else:
-				send_numeric(331, [self.nick, chan], ':No topic is set', self)
-
-			chan.modes.send(self)
-
-			chan.names(self)
-
 	def part(self, chan):
 		if chan  in self.channels:
-			self.channels.discard(channel)
+			self.channels.discard(chan)
 			chan.part(self)
 
 	def kick(self, source, channel, reason):
@@ -154,7 +145,7 @@ class User(object):
 					data += '\r\n'
 
 					self._conn.send(data.encode('utf-8'))
-			except (ConnectionResetError):
+			except (ConnectionResetError, ConnectionAbortedError):
 				self.die('Peer, this bastard.')
 
 	def send_relatives(self, data, me=True):
@@ -171,7 +162,7 @@ class User(object):
 					data = self._conn.recv(512)
 					assert data
 					
-				except (UnicodeDecodeError, AssertionError, ConnectionResetError):
+				except (UnicodeDecodeError, AssertionError, ConnectionResetError, ConnectionAbortedError):
 					self.die('Peer, this bastard.')
 					break
 
@@ -223,8 +214,6 @@ class User(object):
 	@property
 	def is_registered(self):
 		return self.modes.has('r')
-
-
 	
 	@property
 	def is_ready(self):
@@ -251,3 +240,9 @@ class User(object):
 			return '%s!%s@%s' % (self.nick, self.username, self.hostname)
 		else:
 			return 'Anonymous!Anonymous@%s' % (self._ip[0])
+
+	def userhost(self):
+		if self.is_ready:
+			return '%s@%s' % (self.username, self.hostname)
+
+		return ''

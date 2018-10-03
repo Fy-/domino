@@ -34,10 +34,6 @@ def JOIN(user, args):
 
 
 def PART(user, args):
-	if len(args) != 1:
-		send_numeric(461, [user.nick, 'PART'], ':Not enough parameters')
-		return
-
 	def _part(user, chan_str):
 		chan = Chan.create_or_get_chan(user, chan_str)
 		if not chan:
@@ -67,7 +63,7 @@ def NAMES(user, args):
 		send_numeric(401, [user.nickname, chan_str], ':No such nick/channel', user)
 		return
 
-	chan.names()
+	chan.names(user)
 
 def WHO(user, args):
 	# WHO #domino %ctnf,152

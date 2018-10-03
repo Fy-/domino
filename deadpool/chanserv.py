@@ -31,9 +31,9 @@ class DeadpoolChan(Base):
 def chanserv_on_create(user, channel):
 	session = Session()
 	chan = session.query(DeadpoolChan).filter(DeadpoolChan.id == channel.id).first()
-	if chan.bot != None:
-		bot = domi.users.get(chan.bot.lower())
+	bot = domi.users.get('deadpool')
 
+	if channel not in bot.channels:
 		bot.join(channel)
 		channel.modes.add(bot, ['', '+r'])
 		channel.modes.add(bot, ['', '+ovhqa', bot.nick])
@@ -44,7 +44,9 @@ def chanserv_on_create(user, channel):
 
 		for _user in channel.users:
 			if _user.nick != bot.nick:
-				channel.modes.add(_user, ['', '-ovhqa', _user.nick])
+				channel.modes.add(bot, ['', '-ovhqa', _user.nick])
+				channel.names(_user)
+
 
 def chanserv_privmsg(user, args):
 	session = Session()
@@ -56,10 +58,12 @@ def chanserv_privmsg(user, args):
 	def _help(user, args):
 		chanserv.privmsg(user, 'ChanServ allows you to register a channel.', 'NOTICE')
 		chanserv.privmsg(user, '	', 'NOTICE')
-		chanserv.privmsg(user, '	ASSIGN		/msg chanserv assign <channel>		Assign a bot to your channel.', 'NOTICE')
+		#chanserv.privmsg(user, '	ASSIGN		/msg chanserv assign <channel>		Assign a bot to your channel.', 'NOTICE')
 		chanserv.privmsg(user, '	REGISTER	/msg chanserv register <channel>	Register a channel.', 'NOTICE')
 		chanserv.privmsg(user, '	', 'NOTICE')
 
+
+	'''
 	def _assign(user, args):
 		if len(args) == 2:
 			chan = domi.chans.get(args[1].lower())
@@ -91,6 +95,7 @@ def chanserv_privmsg(user, args):
 			return
 
 		chanserv.privmsg(user, 'ASSIGN	/msg chanserv assign <channel>	-	IDENTIFY YOURSELF!', 'NOTICE')
+	'''
 
 	def _register(user, args):
 		if len(args) == 2:
@@ -111,24 +116,22 @@ def chanserv_privmsg(user, args):
 				chanserv.privmsg(user, 'REGISTER	/msg chanserv register <channel>	-	You need to be logged with NickServ..', 'NOTICE')
 				return
 
-			_chan = DeadpoolChan(id=chan.id, name=chan.name, id_owner=user.data_user.nick, bot=None)
-			session.add(_chan	)
+			_chan = DeadpoolChan(id=chan.id, name=chan.name, id_owner=user.data_user.nick, bot=botserv.nick)
+			session.add(_chan)
 			session.commit()
 			chan.modes.add(chanserv, ['', '+r'])
 			chanserv.privmsg(user, 'Well done, %s is now yours.' % (chan.name), 'NOTICE')
+			chanserv_on_create(user, chan)
 
-			#: Add cb for on create
 			return
 
 		chanserv.privmsg(user, 'REGISTER	/msg chanserv register <channel>	-	Register a channel.', 'NOTICE')
 
 
-
-
 	if args[0] == 'register':
 		_register(user, args)
-	elif args[0] == 'assign':
-		_assign(user, args)
+	#elif args[0] == 'assign':
+	#	_assign(user, args)
 	elif args[0] == 'help':
 		_help(user, args)
 	else:
