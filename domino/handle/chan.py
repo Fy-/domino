@@ -41,7 +41,10 @@ def PART(user, args):
 			return 
 		
 		user.part(chan)
-			
+	
+	if len(args) == 0:
+		return
+		
 	if '#' not in args[0]:
 		send_numeric(403, [user.nickname, chan_str], ':No such nick/channel', user)
 		return
@@ -80,14 +83,14 @@ def WHO(user, args):
 		chan.who(user)
 
 def TOPIC(user, args):
-	if '#' in args[0] and len(args) == 2:
+	if len(args) == 2 and '#' in args[0]:
 		chan = DominoData.chans.get(args[0].lower())
 		if not chan:
 			send_numeric(401, [user.nickname, args[0]], ':No such nick/channel', user)
 			return
 		
 		chan.update_topic(user, args[1])
-	elif '#' in args[0] and len(args) == 1:
+	elif len(args) == 1 and '#' in args[0]:
 		chan = DominoData.chans.get(args[0].lower())
 		if not chan:
 			send_numeric(401, [user.nickname, args[0]], ':No such nick/channel', user)

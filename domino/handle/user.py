@@ -15,6 +15,8 @@ def PING(user, args):
 	if len(args) == 1:
 		user.update_ping(args[0])
 
+	user.update_ping('')
+	
 def PONG(user, args):
 	user.update_ping()
 
@@ -76,6 +78,9 @@ def AWAY(user, args):
 
 
 def MODE(user, args):
+	if len(args) == 0:
+		return
+
 	if '#' in args[0]:
 		chan = DominoData.chans.get(args[0].lower())
 		if not chan:
@@ -141,6 +146,9 @@ def WHOIS(user, args):
 	send_numeric(318, [user.nick, target.nick], ':End of /WHOIS list.', user)
 
 def USERHOST(user, args):
+	if len(args) == 0:
+		return
+
 	user_list = ''
 	for user_str in args:
 		_user = DominoData.users.get(user_str.lower())
@@ -188,6 +196,9 @@ def USER(user, args):
 				user.join(chan)
 
 def ISON(user, args):
+	if len(args) == 0:
+		return
+
 	user_list = ''
 	for user_str in args:
 		_user = DominoData.users.get(user_str.lower())
