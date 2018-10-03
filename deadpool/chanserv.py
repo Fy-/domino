@@ -56,10 +56,8 @@ def chanserv_privmsg(user, args):
 	def _help(user, args):
 		chanserv.privmsg(user, 'ChanServ allows you to register a channel.', 'NOTICE')
 		chanserv.privmsg(user, '	', 'NOTICE')
-		#chanserv.privmsg(user, '	ASSIGN		/msg chanserv assign <channel>		Assign a bot to your channel.', 'NOTICE')
 		chanserv.privmsg(user, '	REGISTER	/msg chanserv register <channel>	Register a channel.', 'NOTICE')
 		chanserv.privmsg(user, '	', 'NOTICE')
-
 
 	def _register(user, args):
 		if len(args) == 2:
@@ -94,8 +92,6 @@ def chanserv_privmsg(user, args):
 
 	if args[0] == 'register':
 		_register(user, args)
-	#elif args[0] == 'assign':
-	#	_assign(user, args)
 	elif args[0] == 'help':
 		_help(user, args)
 	else:

@@ -57,7 +57,6 @@ def deadpool(server):
 	except:
 		channels = []
 
-	print(channels)
 	for chan in channels:
 		domi.add_callback('on_create_chan', chanserv_on_create, key=chan.id)
 		if chan.bot != None:

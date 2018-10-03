@@ -65,11 +65,13 @@ class Domino(object):
 
 			if not line:
 				print('killed no line')
-				user.die()
+				user.die('Peer.')
 			else:
 				IRCProtocol.parse(line, user)
 
-		user.die()
+		user.die('I\'m suppose to be already dead.')
+		sock.shutdown(gevent.socket.SHUT_RDWR)
+		sock.close()
 
 	def run(self):
 		print ('[Domino] Starting domino on {0}:{1} ...'.format(self.host, self.port))
