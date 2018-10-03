@@ -7,12 +7,11 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from domino.data import DominoData as domi
 
-from deadpool.db import Base, engine, Session
+from deadpool.db import Base, engine, session
 from deadpool.chanserv import DeadpoolChan
 from deadpool.nickserv import DeadpoolUser
 
 def operserv_privmsg(user, args):
-	session = Session()
 	args = args.split(' ')
 	args[0] = args[0].lower()
 

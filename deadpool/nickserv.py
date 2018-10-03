@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import synonym
 
-from deadpool.db import Base, Session
+from deadpool.db import Base, session
 from domino.data import DominoData as domi
 
 class DeadpoolUser(Base):
@@ -29,7 +29,6 @@ class DeadpoolUser(Base):
 	password = synonym('_password', descriptor=property(_get_password, _set_password))
 
 def nickserv_privmsg(user, args):
-	session = Session()
 	args = args.split(' ')
 	args[0] = args[0].lower()
 

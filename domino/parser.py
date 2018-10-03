@@ -31,29 +31,28 @@ class IRCProtocol(object):
 			handle._unknown(user)
 
 	@staticmethod
-	def parse(data, user):
-		if not data or len(data) == 0 or len(data) > 512:
-			return False
+	def parse(line, user):
+		if not line or len(line) == 0 or len(line) > 512:
+			return
 
-		data = IRCProtocol.irc_decode(data)
+		line = IRCProtocol.irc_decode(line)
 		user.update_idle()
-		for line in data.split('\n'):
-			line = line.strip(' \t\n\r')
-			print('<<< %s' % (line))
-			
-			x = line.split(' ', 1)
-			command = x[0].upper()
+		line = line.strip(' \t\n\r')
+		print('<<< %s' % (line))
+		
+		x = line.split(' ', 1)
+		command = x[0].upper()
 
-			if len(x) == 1:
-				args = []
+		if len(x) == 1:
+			args = []
+		else:
+			if ':' in x[1]:
+				y = x[1].split(':', 1)
+				args = y[0].strip(' ').split(' ')
+				if len(args) == 1 and len(args[0]) == 0:
+					args = []
+				args.append(y[1])
 			else:
-				if ':' in x[1]:
-					y = x[1].split(':', 1)
-					args = y[0].strip(' ').split(' ')
-					if len(args) == 1 and len(args[0]) == 0:
-						args = []
-					args.append(y[1])
-				else:
-					args = x[1].split(' ')
+				args = x[1].split(' ')
 
-			IRCProtocol.handle_cmd(user, command, args)
+		IRCProtocol.handle_cmd(user, command, args)

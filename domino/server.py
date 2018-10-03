@@ -4,12 +4,19 @@
 	~~~~~~~~~~~~~~~~
 	:license: BSD, see LICENSE for more details.
 """
-import datetime, ssl, socket
+import datetime
 from threading import Thread
+
+import gevent
+import gevent.server
+import gevent.monkey
+import gevent.pool
+gevent.monkey.patch_all()
 
 from domino.user import User
 from domino.data import DominoData
 from domino.markov import create_chain
+from domino.parser import IRCProtocol
 
 __version__ = '0.10.dev'
 
@@ -49,7 +56,28 @@ class Domino(object):
 		for data in DominoData.services:
 			User(self, data=data, service=True)
 
+	def handle(self, sock, addr):
+		fileobj = sock.makefile('rbwb')
+		user = User(server=self, conn=[sock, fileobj], ip=addr)
+		user.update_hostname()
+		while user.is_alive:
+			line = fileobj.readline()
+
+			if not line:
+				print('killed no line')
+				user.die()
+			else:
+				IRCProtocol.parse(line, user)
+
+		user.die()
+
 	def run(self):
+		print ('[Domino] Starting domino on {0}:{1} ...'.format(self.host, self.port))
+		self.pool = gevent.pool.Pool(10000)
+		self.server = gevent.server.StreamServer((self.host, self.port), self.handle, spawn=self.pool)
+		self.server.serve_forever()
+
+		'''
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
 		sock.bind((self.host, self.port))
@@ -66,3 +94,4 @@ class Domino(object):
 			user = User(server=self, conn=conn, ip=ip)
 			user.update_hostname()
 			Thread(target = user.listen).start()
+		'''

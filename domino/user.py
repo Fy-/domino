@@ -139,14 +139,10 @@ class User(object):
 		
 	def send(self, data):
 		if not self.service:
-			try:
-				if self._alive:
-					print ('>>> %s' % (data))
-					data += '\r\n'
-
-					self._conn.send(data.encode('utf-8'))
-			except (ConnectionResetError, ConnectionAbortedError):
-				self.die('Peer, this bastard.')
+			print('>>> %s' % (data))
+			data += '\n'
+			self._conn[1].write(data.encode('utf-8'))
+			self._conn[1].flush()
 
 	def send_relatives(self, data, me=True):
 		_relatives = self.relatives.copy()
@@ -156,6 +152,7 @@ class User(object):
 		del _relatives
 
 	def listen(self):
+		'''
 		if not self.service:
 			while self._alive:
 				try:
@@ -170,6 +167,7 @@ class User(object):
 				IRCProtocol.parse(data, self)
 					
 			self._conn.close()
+		'''
 
 	def quit(self, reason=''):
 		self.send('%s QUIT :%s' % (self, reason))

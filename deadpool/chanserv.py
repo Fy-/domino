@@ -9,7 +9,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import synonym
 import os, random
 
-from deadpool.db import Base, Session
+from deadpool.db import Base, session
 from domino.data import DominoData as domi
 
 deadpool_quotes_file = os.path.join(os.path.dirname(__file__), 'quotes.txt')
@@ -29,7 +29,6 @@ class DeadpoolChan(Base):
 	id_owner = Column(String(50), ForeignKey('user.nick'))
 
 def chanserv_on_create(user, channel):
-	session = Session()
 	chan = session.query(DeadpoolChan).filter(DeadpoolChan.id == channel.id).first()
 	bot = domi.users.get('deadpool')
 
@@ -49,7 +48,6 @@ def chanserv_on_create(user, channel):
 
 
 def chanserv_privmsg(user, args):
-	session = Session()
 	args = args.split(' ')
 	args[0] = args[0].lower()
 	chanserv = domi.users.get('chanserv')
@@ -139,8 +137,6 @@ def chanserv_privmsg(user, args):
 
 
 def botserv_privmsg(user, channel, args):
-	print(user, channel, args)
-	session = Session()
 
 	args = args.split(' ')
 	args[0] = args[0].lower()
