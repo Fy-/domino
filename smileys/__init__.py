@@ -12,9 +12,6 @@ class ServerSideSmiley(object):
 
 	def init(self, server):
 		def _replace(user, data):
-			if not data:
-				return data
-				
 			smileys = {
 				':('      : '😒',
 				':)'      : '😊',

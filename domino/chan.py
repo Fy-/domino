@@ -78,11 +78,11 @@ class Chan(object):
 
 			if self.id in DominoData.callback['on_privmsg_chan']:
 				for callback in DominoData.callback['on_privmsg_chan'][self.id]:
-					data = callback(user, self, data)
+					data = callback(user, self, data) or data
 
 			if '*' in DominoData.callback['on_privmsg_chan']:
 				for callback in DominoData.callback['on_privmsg_chan']['*']:
-					data = callback(user, self, data)
+					data = callback(user, self, data) or data
 
 			self.send(':%s %s %s :%s' % (user, cmd, self.name, data), me=user)
 

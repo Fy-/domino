@@ -133,11 +133,11 @@ class User(object):
 
 		if '*' in DominoData.callback['on_privmsg']:
 			for callback in DominoData.callback['on_privmsg']['*']:
-				data = callback(self, data)
+				data = callback(self, data) or data
 
 		if target.nick.lower() in DominoData.callback['on_privmsg']:
 			for callback in DominoData.callback['on_privmsg'][target.nick.lower()]:
-				data = callback(self, data)
+				data = callback(self, data) or data
 
 		target.send(':%s %s %s :%s' % (self, cmd, target.nick, data))
 		
