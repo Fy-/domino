@@ -26,7 +26,8 @@ privmsg #chan commands: !op !deop !topic !voice !devoice !voiceall !owner !strip
 
 ## Unique features
 Extensions are not active with the new version, please be patient.
-__1. OperServ name is Loki__
+__1. OperServ name is Loki:__
+Best feature ever.
 
 __2. Best hostnames ever:__ Using markov chains and MCU Subtitles
 ```
