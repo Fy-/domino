@@ -87,6 +87,16 @@ def TOPIC(user, args):
 			return
 		
 		chan.update_topic(user, args[1])
+	elif '#' in args[0] and len(args) == 1:
+		chan = DominoData.chans.get(args[0].lower())
+		if not chan:
+			send_numeric(401, [user.nickname, args[0]], ':No such nick/channel', user)
+			return
+			
+		if chan.topic:
+			send_numeric(332, [user.nick, chan], ':%s' % (chan.topic), user)
+		else:
+			send_numeric(331, [user.nick, chan], ':No topic is set', user)
 	else:
-		send_numeric(461, [user.nick, 'TOPIC'], ':Not enough parameters')
+		send_numeric(461, [user.nick, 'TOPIC'], ':Not enough parameters',  user)
 
