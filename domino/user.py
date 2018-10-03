@@ -138,7 +138,7 @@ class User(object):
 		target.send(':%s %s %s :%s' % (self, cmd, target.nick, data))
 		
 	def send(self, data):
-		if not self.service:
+		if not self.service and self.is_alive:
 			print('>>> %s' % (data))
 			data += '\n'
 			self._conn[1].write(data.encode('utf-8'))
@@ -151,28 +151,9 @@ class User(object):
 				relative.send(data)
 		del _relatives
 
-	def listen(self):
-		'''
-		if not self.service:
-			while self._alive:
-				try:
-					data = self._conn.recv(512)
-					assert data
-					
-				except (UnicodeDecodeError, AssertionError, ConnectionResetError, ConnectionAbortedError):
-					self.die('Peer, this bastard.')
-					break
-
-				
-				IRCProtocol.parse(data, self)
-					
-			self._conn.close()
-		'''
-
 	def quit(self, reason=''):
 		self.send('%s QUIT :%s' % (self, reason))
 		self.die(reason)
-
 
 	def kill(self, source, reason=''):
 		self.send('%s KILL %s :%s' % (self, source.nick, reason))
@@ -196,11 +177,9 @@ class User(object):
 
 			del _relatives
 
-			
 			if self.nick and self.nick.lower() in DominoData.users:	
 				del DominoData.users[self.nick.lower()]
 
-		
 	@property
 	def is_alive(self):
 		return self._alive

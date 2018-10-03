@@ -61,40 +61,6 @@ def chanserv_privmsg(user, args):
 		chanserv.privmsg(user, '	', 'NOTICE')
 
 
-	'''
-	def _assign(user, args):
-		if len(args) == 2:
-			chan = domi.chans.get(args[1].lower())
-			if not chan:
-				chanserv.privmsg(user, 'ASSIGN	/msg chanserv assign <channel>	-	Incorrect channel.', 'NOTICE')
-				return
-
-			exist = session.query(DeadpoolChan).filter(DeadpoolChan.name == chan.name).first()
-			if not exist:
-				chanserv.privmsg(user, 'ASSIGN	/msg chanserv assign <channel>	-	This channel is already registered.', 'NOTICE')
-				return
-
-			if user.data_user == None:
-				chanserv.privmsg(user, 'ASSIGN	/msg chanserv assign <channel>	-	You need to register this channel.', 'NOTICE')
-				return
-
-			if exist.id_owner != user.data_user.nick:
-				chanserv.privmsg(user, 'ASSIGN	/msg chanserv assign <channel>	-	You\'re not the owner of this channel.', 'NOTICE')
-				return
-
-			botserv.join(chan)
-			chan.modes.add(botserv, ['', '+ovhqa', botserv.nick])
-			chan.modes.add(user, ['', '+ovhqa', user.nick])
-			chan.privmsg(botserv, get_random_deadpool_quote(), 'PRIVMSG')
-			_chan = session.query(DeadpoolChan).filter(DeadpoolChan.id == chan.id).first()
-			_chan.bot = botserv.nick
-			session.commit()
-
-			return
-
-		chanserv.privmsg(user, 'ASSIGN	/msg chanserv assign <channel>	-	IDENTIFY YOURSELF!', 'NOTICE')
-	'''
-
 	def _register(user, args):
 		if len(args) == 2:
 			chan = domi.chans.get(args[1].lower())

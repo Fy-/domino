@@ -76,22 +76,3 @@ class Domino(object):
 		self.pool = gevent.pool.Pool(10000)
 		self.server = gevent.server.StreamServer((self.host, self.port), self.handle, spawn=self.pool)
 		self.server.serve_forever()
-
-		'''
-		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
-		sock.bind((self.host, self.port))
-		print ('[Domino] Starting domino on {0}:{1} ...'.format(self.host, self.port))
-
-		while 1:
-			sock.listen(0)
-			(conn, ip) = sock.accept()
-
-			if ip[0] in self.config.get('back_list'):
-				conn.close()
-				continue
-
-			user = User(server=self, conn=conn, ip=ip)
-			user.update_hostname()
-			Thread(target = user.listen).start()
-		'''
