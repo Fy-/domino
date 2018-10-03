@@ -36,5 +36,6 @@ __2. Best hostnames ever:__ Using markov chains and MCU Subtitles
 
 __3. Server side smileys: (stupid concept)__
 ```
- ':(': '😒', ':)': '😊', ':D': '😃', '>.<'  : '😆', '^^': '😄', ':|': '😐', ':p': '😋', '=)': '㋡', '<3': '❤', ':x': '☠', '(note)'  : '♫', '(mail)'  : '✉', '(star)'  : '✩', '(valid)' : '✔', '(flower)': '❀', '(plane)' : '✈', '(copy)'  : '©', '(tel)'   : '☎', 'x.x'  : '٩(×̯×)۶', 'o.o'  : 'Ꙩ_Ꙩ', '<3.<3' : '❤‿❤'
+<Fy>  😠 😠 😠
+<Fy> https://github.com/Fy-/domino/blob/master/smileys/emoji.py XD
 ```
