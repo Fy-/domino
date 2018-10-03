@@ -32,7 +32,7 @@ __1. Best hostnames ever:__ Using markov chains and MCU Subtitles
   @when.you.save.the.world.proxad.net
 ```
 
-__2. Server side smileys:__
+__2. Server side smileys: (stupid concept)__
 ```
  ':(': '😒', ':)': '😊', ':D': '😃', '>.<'  : '😆', '^^': '😄', ':|': '😐', ':p': '😋', '=)': '㋡', '<3': '❤', ':x': '☠', '(note)'  : '♫', '(mail)'  : '✉', '(star)'  : '✩', '(valid)' : '✔', '(flower)': '❀', '(plane)' : '✈', '(copy)'  : '©', '(tel)'   : '☎', 'x.x'  : '٩(×̯×)۶', 'o.o'  : 'Ꙩ_Ꙩ', '<3.<3' : '❤‿❤'
 ```
