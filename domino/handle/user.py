@@ -136,7 +136,7 @@ def WHOIS(user, args):
 
 	if target.is_registered:
 		send_numeric(307, [user.nick, target.nick], ':is identified for this nick', user)
-		send_numeric(330, [user.nick, target.nick, target.nick], ': is logged in as', user)
+		send_numeric(330, [user.nick, target.nick, target.nick], ':is logged in as', user)
 
 	send_numeric(317, [user.nick, target.nick, (int(time.time()) - target.idle), target.created], ':seconds idle, signon time', user)
 	send_numeric(312, [user.nick, target.nick, target.server.name], ':%s' % (user.server.name), user)

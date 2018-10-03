@@ -137,7 +137,6 @@ def chanserv_privmsg(user, args):
 
 
 def botserv_privmsg(user, channel, args):
-
 	args = args.split(' ')
 	args[0] = args[0].lower()
 	chan = session.query(DeadpoolChan).filter(DeadpoolChan.id == channel.id).first()
@@ -192,7 +191,7 @@ def botserv_privmsg(user, channel, args):
 		elif args[0] == '!voiceall':
 			if len(args) == 1:
 				for _user in channel.users:
-					channel.modes.add(bot, ['', '-v', _user.nick])
+					channel.modes.add(bot, ['', '+v', _user.nick])
 		elif args[0] == '!kick':
 			if len(args) == 2:
 				_user = domi.users.get(args[1].lower())
