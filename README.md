@@ -26,13 +26,14 @@ privmsg #chan commands: !op !deop !topic !voice !devoice !voiceall !owner !strip
 
 ## Unique features
 Extensions are not active with the new version, please be patient.
+__1. OperServ name is Loki__
 
-__1. Best hostnames ever:__ Using markov chains and MCU Subtitles
+__2. Best hostnames ever:__ Using markov chains and MCU Subtitles
 ```
   @when.you.save.the.world.proxad.net
 ```
 
-__2. Server side smileys: (stupid concept)__
+__3. Server side smileys: (stupid concept)__
 ```
  ':(': '😒', ':)': '😊', ':D': '😃', '>.<'  : '😆', '^^': '😄', ':|': '😐', ':p': '😋', '=)': '㋡', '<3': '❤', ':x': '☠', '(note)'  : '♫', '(mail)'  : '✉', '(star)'  : '✩', '(valid)' : '✔', '(flower)': '❀', '(plane)' : '✈', '(copy)'  : '©', '(tel)'   : '☎', 'x.x'  : '٩(×̯×)۶', 'o.o'  : 'Ꙩ_Ꙩ', '<3.<3' : '❤‿❤'
 ```
