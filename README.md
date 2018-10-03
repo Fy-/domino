@@ -12,13 +12,13 @@ py run.py #: edit config dict (oper password with werkzeug.security.generate_pas
 ## services
 ```
 -NickServ-  NickServ allows you to register a nickname.
--NickServ- 	GHOST		  /msg nickserv ghost <nick> <pass>		Kill someone with your nickname.
--NickServ- 	IDENTIFY  /msg nickserv identify <pass>			Identify yourself.
+-NickServ- 	GHOST		  /msg nickserv ghost <nick> <pass>		  Kill someone with your nickname.
+-NickServ- 	IDENTIFY  /msg nickserv identify <pass>			    Identify yourself.
 -NickServ- 	REGISTER  /msg nickserv register <pass> <mail>	Register your current nickname
 -NickServ- 	
   
 -ChanServ-  ChanServ allows you to register a channel.
--ChanServ- 	REGISTER	/msg chanserv register <channel>	Register a channel.
+-ChanServ- 	REGISTER	/msg chanserv register <channel>	    Register a channel.
 
 privmsg #chan commands: !op !deop !topic !voice !devoice !voiceall !owner !strip !kick ^_^
 ```
