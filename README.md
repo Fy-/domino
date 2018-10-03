@@ -27,7 +27,7 @@ privmsg #chan commands: !op !deop !topic !voice !devoice !voiceall !owner !strip
 ```
 
 
-## Unique features
+## unique features
 
 __1. OperServ name is Loki:__
 Best feature ever.
