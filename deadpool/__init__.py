@@ -11,55 +11,57 @@ from deadpool.chanserv import DeadpoolChan, chanserv_privmsg, chanserv_on_create
 
 from deadpool.db import Base, Session
 
-def deadpool(server):
-	session = Session()
-	print ('[Domino] [Deadpool] Loading Deadpool - I will shoot your f*cking cat!')
+class Deadpool(object):
+	def __init__(self):
+		print ('[Domino] [Deadpool] Loading Deadpool')
 
-	domi.services.append(
-		{
-			'nick': 'NickServ',
-			'realname': 'NickServ - Nick Service',
-			'virthost': 'nickserv%s' % (server.config['host_mask']),
-			'oper': True
-		}
-	)
-	domi.services.append(
-		{
-			'nick': 'ChanServ',
-			'realname': 'ChanServ - Chan service',
-			'virthost': 'nickserv%s' % (server.config['host_mask']),
-			'oper': True
-		}
-	)
-	domi.services.append(
-		{
-			'nick': 'Deadpool',
-			'realname': 'Wade <Deadpool><Ryan Reynolds> Wilson',
-			'virthost': 'bad.deadpool.good.deadpool%s' % (server.config['host_mask']),
-			'oper': True
-		}
-	)
-	domi.services.append(
-		{
-			'nick': 'Loki',
-			'realname': 'Loki Laufeyson - God of Mischief',
-			'virthost': 'tom.hiddleston%s' % (server.config['host_mask']),
-			'oper': True
-		}
-	)
+	def init(self, server):
 
-	domi.add_callback('on_privmsg', nickserv_privmsg, key='nickserv')
-	domi.add_callback('on_privmsg', operserv_privmsg, key='loki')
-	domi.add_callback('on_privmsg', chanserv_privmsg, key='chanserv')
+		domi.services.append(
+			{
+				'nick': 'NickServ',
+				'realname': 'NickServ - Nick Service',
+				'virthost': 'nickserv%s' % (server.config['host_mask']),
+				'oper': True
+			}
+		)
+		domi.services.append(
+			{
+				'nick': 'ChanServ',
+				'realname': 'ChanServ - Chan service',
+				'virthost': 'nickserv%s' % (server.config['host_mask']),
+				'oper': True
+			}
+		)
+		domi.services.append(
+			{
+				'nick': 'Deadpool',
+				'realname': 'Wade <Deadpool><Ryan Reynolds> Wilson',
+				'virthost': 'bad.deadpool.good.deadpool%s' % (server.config['host_mask']),
+				'oper': True
+			}
+		)
+		domi.services.append(
+			{
+				'nick': 'Loki',
+				'realname': 'Loki Laufeyson - God of Mischief',
+				'virthost': 'tom.hiddleston%s' % (server.config['host_mask']),
+				'oper': True
+			}
+		)
 
-	try:
-		channels = session.query(DeadpoolChan).all()
-	except:
-		channels = []
+		domi.add_callback('on_privmsg', nickserv_privmsg, key='nickserv')
+		domi.add_callback('on_privmsg', operserv_privmsg, key='loki')
+		domi.add_callback('on_privmsg', chanserv_privmsg, key='chanserv')
 
-	for chan in channels:
-		domi.add_callback('on_create_chan', chanserv_on_create, key=chan.id)
-		if chan.bot != None:
-			domi.add_callback('on_privmsg_chan', botserv_privmsg, key=chan.id)
+		try:
+			channels = session.query(DeadpoolChan).all()
+		except:
+			channels = []
 
-	return server
+		for chan in channels:
+			domi.add_callback('on_create_chan', chanserv_on_create, key=chan.id)
+			if chan.bot != None:
+				domi.add_callback('on_privmsg_chan', botserv_privmsg, key=chan.id)
+
+		print ('[Domino] [Deadpool] I will shoot your f*cking cat! - Loaded')

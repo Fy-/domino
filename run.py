@@ -2,7 +2,8 @@
 import os
 
 from domino import Domino
-from deadpool import deadpool
+from deadpool import Deadpool
+from smileys import ServerSideSmiley
 
 def main():
     #: Config sample
@@ -23,7 +24,12 @@ def main():
 
 
     srv = Domino(config) #: Prepare Server
-    deadpool(srv) #: Activate services
+
+    dp = Deadpool() #: services
+    dp.init(srv)
+
+    sm = ServerSideSmiley() #: Server side smiley (stupid concept ^_^)
+    sm.init(srv)
 
     srv.init()
     srv.run() #: Run

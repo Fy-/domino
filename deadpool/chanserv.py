@@ -48,6 +48,7 @@ def chanserv_on_create(user, channel):
 
 
 def chanserv_privmsg(user, args):
+	data = args
 	args = args.split(' ')
 	args[0] = args[0].lower()
 	chanserv = domi.users.get('chanserv')
@@ -58,16 +59,17 @@ def chanserv_privmsg(user, args):
 		chanserv.privmsg(user, '	', 'NOTICE')
 		chanserv.privmsg(user, '	REGISTER	/msg chanserv register <channel>	Register a channel.', 'NOTICE')
 		chanserv.privmsg(user, '	', 'NOTICE')
+		return data
 
 	def _register(user, args):
 		if len(args) == 2:
 			chan = domi.chans.get(args[1].lower())
 			if not chan:
 				chanserv.privmsg(user, 'REGISTER	/msg chanserv register <channel>	-	Incorrect channel.', 'NOTICE')
-				return
+				return data
 			if user not in chan.modes.data['q']:
 				chanserv.privmsg(user, 'REGISTER	/msg chanserv register <channel>	-	You\'re not the owner of this channel. But nice try.', 'NOTICE')
-				return
+				return data
 
 			exist = session.query(DeadpoolChan).filter(DeadpoolChan.name == chan.name).first()
 			if exist:
@@ -76,7 +78,7 @@ def chanserv_privmsg(user, args):
 
 			if user.modes.data['r'] == False or user.data_user == None:
 				chanserv.privmsg(user, 'REGISTER	/msg chanserv register <channel>	-	You need to be logged with NickServ..', 'NOTICE')
-				return
+				return data
 
 			_chan = DeadpoolChan(id=chan.id, name=chan.name, id_owner=user.data_user.nick, bot=botserv.nick)
 			session.add(_chan)
@@ -85,9 +87,10 @@ def chanserv_privmsg(user, args):
 			chanserv.privmsg(user, 'Well done, %s is now yours.' % (chan.name), 'NOTICE')
 			chanserv_on_create(user, chan)
 
-			return
+			return data
 
 		chanserv.privmsg(user, 'REGISTER	/msg chanserv register <channel>	-	Register a channel.', 'NOTICE')
+		return data
 
 
 	if args[0] == 'register':
@@ -96,27 +99,29 @@ def chanserv_privmsg(user, args):
 		_help(user, args)
 	else:
 		chanserv.privmsg(user, 'Donde esta la biblioteca ?	-	/msg nickserv help', 'NOTICE')
+		return data
 
 
 def botserv_privmsg(user, channel, args):
+	data = args
 	args = args.split(' ')
 	args[0] = args[0].lower()
 	chan = session.query(DeadpoolChan).filter(DeadpoolChan.id == channel.id).first()
 
 	if not chan:
-		return
+		return data
 
 	if not chan.bot:
-		return
+		return data
 
 	bot = domi.users.get(chan.bot.lower())
 
 	if not bot:
-		return
+		return data
 
 	if args[0] == '!quote':
 		channel.privmsg(bot, get_random_deadpool_quote(), 'PRIVMSG')
-		return
+		return data
 	if (user.data_user != None and user.data_user.nick == chan.id_owner) or channel.modes.can(user, 'o'):
 		if args[0] == '!topic':
 			chan.topic = ' '.join(args[1:])
@@ -177,3 +182,5 @@ def botserv_privmsg(user, channel, args):
 				_user = domi.users.get(args[1].lower())
 				if _user:
 					channel.modes.add(bot, ['', '-ovhqa', _user.nick])
+
+	return data

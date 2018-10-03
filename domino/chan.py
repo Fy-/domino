@@ -75,11 +75,17 @@ class Chan(object):
 
 	def privmsg(self, user, data, cmd):
 		if self.can_talk(user):
-			self.send(':%s %s %s :%s' % (user, cmd, self.name, data), me=user)
 
 			if self.id in DominoData.callback['on_privmsg_chan']:
 				for callback in DominoData.callback['on_privmsg_chan'][self.id]:
-					callback(user, self, data)
+					data = callback(user, self, data)
+
+			if '*' in DominoData.callback['on_privmsg_chan']:
+				for callback in DominoData.callback['on_privmsg_chan']['*']:
+					data = callback(user, self, data)
+
+			self.send(':%s %s %s :%s' % (user, cmd, self.name, data), me=user)
+
 		else:
 			send_numeric(404, [user.nick, self.name], ':Cannot send to channel', user)
 

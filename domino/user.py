@@ -111,7 +111,6 @@ class User(object):
 		self.nick = new_nick
 		DominoData.users[new_nick.lower()] = self
 
-
 	def join(self, chan):
 		if chan not in self.channels:
 			self.channels.add(chan)
@@ -131,9 +130,13 @@ class User(object):
 		if self.away:
 			send_numeric(301, [self.nick, target.nick], ':%s' % (target.away), self)
 
+		if '*' in DominoData.callback['on_privmsg']:
+			for callback in DominoData.callback['on_privmsg']['*']:
+				data = callback(self, data)
+
 		if target.nick.lower() in DominoData.callback['on_privmsg']:
 			for callback in DominoData.callback['on_privmsg'][target.nick.lower()]:
-				callback(self, data)
+				data = callback(self, data)
 
 		target.send(':%s %s %s :%s' % (self, cmd, target.nick, data))
 		
