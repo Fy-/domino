@@ -5,6 +5,9 @@
 	:license: BSD, see LICENSE for more details.
 """
 
+"""
+	List from Emoji: https://github.com/carpedm20/emoji
+"""
 emoji = {
 	':1st_place_medal:': '\U0001F947',
 	':2nd_place_medal:': '\U0001F948',
