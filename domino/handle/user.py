@@ -12,16 +12,18 @@ from domino.mode import UserMode, ChanMode
 from domino.chan import Chan
 
 def PING(user, args):
-	if len(args) == 1:
-		user.update_ping(args[0])
-
-	user.update_ping('')
-	
-def PONG(user, args):
-	if len(args) == 1:
-		user.send('PING %s :%s' % (self.server.name, args[0]))
-
 	user.update_ping()
+	if len(args) == 1:
+		user.send(':%s PONG %s :%s' % (user.server.name, user.server.name, args[0]))
+	else:
+		user.send(':%s PONG %s :%s' % (user.server.name, user.server.name, ''))
+
+def PONG(user, args):
+	user.update_ping()
+	if len(args) == 1:
+		user.send(':%s PING %s :%s' % (user.server.name, user.server.name, args[0]))
+	else:
+		user.send(':%s PING %s :%s' % (user.server.name, user.server.name, ''))
 
 def QUIT(user, args):
 	if len(args) == 1:

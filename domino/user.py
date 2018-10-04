@@ -88,9 +88,9 @@ class User(object):
 		self.idle = int(time.time())
 		self.ping = int(time.time())
 
-	def update_ping(self, arg=''):
+	def update_ping(self):
 		self.ping = int(time.time())
-		self.send('PONG %s :%s' % (self.server.name, arg))
+		
 
 	def update_away(self, value):
 		if not value:
