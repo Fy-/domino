@@ -18,6 +18,9 @@ def PING(user, args):
 	user.update_ping('')
 	
 def PONG(user, args):
+	if len(args) == 1:
+		user.send('PING %s :%s' % (self.server.name, args[0]))
+
 	user.update_ping()
 
 def QUIT(user, args):

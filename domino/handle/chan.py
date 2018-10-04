@@ -23,7 +23,7 @@ def JOIN(user, args):
 		user.join(chan)
 
 	if '#' not in args[0]:
-		send_numeric(403, [user.nickname, chan_str], ':No such nick/channel', user)
+		send_numeric(403, [user.nickname, args[0]], ':No such nick/channel', user)
 		return
 	
 	if ',' in args[0]:
@@ -46,7 +46,7 @@ def PART(user, args):
 		return
 		
 	if '#' not in args[0]:
-		send_numeric(403, [user.nickname, chan_str], ':No such nick/channel', user)
+		send_numeric(403, [user.nickname, args[0]], ':No such nick/channel', user)
 		return
 
 	if ',' in args[0]:
@@ -63,7 +63,7 @@ def NAMES(user, args):
 
 	chan = DominoData.chans.get(args[0].lower())
 	if not chan:
-		send_numeric(401, [user.nickname, chan_str], ':No such nick/channel', user)
+		send_numeric(401, [user.nickname, args[0]], ':No such nick/channel', user)
 		return
 
 	chan.names(user)
@@ -77,7 +77,7 @@ def WHO(user, args):
 	if '#' in args[0]:
 		chan = DominoData.chans.get(args[0].lower())
 		if not chan:
-			send_numeric(401, [user.nickname, chan_str], ':No such nick/channel', user)
+			send_numeric(401, [user.nickname, args[0]], ':No such nick/channel', user)
 			return
 		
 		chan.who(user)

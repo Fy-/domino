@@ -122,9 +122,9 @@ class User(object):
 			self.channels.discard(chan)
 			chan.part(self)
 
-	def kick(self, source, channel, reason):
-		if chan  in self.channels:
-			self.channels.discard(channel)
+	def kick(self, source, chan, reason):
+		if chan in self.channels:
+			self.channels.discard(chan)
 			chan.kick(source, self, reason)
 
 	def privmsg(self, target, data, cmd):
