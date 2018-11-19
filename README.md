@@ -1,7 +1,13 @@
 # domino
 Python IRC Server - IRCd with services. It's kind of useless. It's also kind of fun. One day domino will be a full-featured IRC server, for now it's just a playground.
 
-**You can join my home server if you're interested by the project: home.fy.to:6667, I'll debug live ^_^**
+**You can join my home server if you're interested by the project: IRC.2KAY.NET, I'll debug live ^_^**
+```
+* Welcome to irc.2kay.net Fy
+* Your host is "irc.2kay.net", running version Domino 0.10.dev
+* This server was created on Thursday, 11. October 2018 06:52AM
+* irc.2kay.net Domino 0.10.dev OQWxrB mrnstlqaovh
+```
 
 ## install
 ```
