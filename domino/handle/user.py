@@ -35,15 +35,12 @@ def QUIT(user, args):
 def NICK(user, args):
 	if len(args) != 1:
 		send_numeric(461, [user.nick, 'NICK'], ':Not enough parameters')
-		return
 
 	if DominoData.users.get(args[0].lower()) != None and DominoData.users.get(args[0].lower()) != user:
 		send_numeric(433, ['*', args[0]], ':Nickname is already in use.', user)
-		return
 
 	if not DominoData.re_nick.match(args[0]):
 		send_numeric(432, ['*', args[0]], ':Erroneous nickname.', user)
-		return
 	
 	user.update_nick(args[0])
 
@@ -164,8 +161,7 @@ def USERHOST(user, args):
 
 def USER(user, args):
 	if len(args) != 4:
-		#: @TODO: Disconnect client.
-		user.die()
+		user.die("What?")
 		return
 
 	if user.is_ready == True:
@@ -180,10 +176,19 @@ def USER(user, args):
 		send_numeric(1, [user.nick], ':Welcome to %s %s' % (user.server.name, user.nick), user)
 		send_numeric(2, [user.nick], ':Your host is "%s", running version %s' % (user.server.name, user.server.version), user)
 		send_numeric(3, [user.nick], ':This server was created on %s' % (user.server.created), user)
-		send_numeric(4, [user.nick], ':%s %s %s %s' % (user.server.name, user.server.version, UserMode.concat(), ChanMode.concat()), user)
-		options_txt = 'CHANTYPES=# CHARSET=utf-8 PREFIX=({0}){1} NICKLEN=50 CHANNELLEN=50 TOPICLEN=390 AWAYLEN=160'.format(ChanMode.concat_modes(), ChanMode.concat_symbols())
-		send_numeric(5, [user.nick], ':%s %s NETWORK=%s :Are supported by this server' % (user.nick, options_txt, user.server.name), user)
-		
+		send_numeric(4, [user.nick], '%s %s %s %s' % (user.server.name, user.server.version, UserMode.concat(), ChanMode.concat()), user)
+		options_txt = [
+			'CMDS=USERIP,STARTTLS,KNOCK,DCCALLOW,MAP UHNAMES NAMESX SAFELIST HCN MAXCHANNELS=30 CHANLIMIT=#:30 MAXLIST=b:60,e:60,I:60 MAXNICKLEN=50 NICKLEN=50 CHANNELLEN=50 TOPICLEN=255 KICKLEN=255',
+			'AWAYLEN=255 WALLCHOPS WATCH=128 WATCHOPTS=A SILENCE=15 MODES=12 CHANTYPES=# PREFIX=(ohv)@%+ CHANMODES='+ ChanMode.concat_modes() +' NETWORK=2Kay CHARSET=utf-8',
+			'ELIST=MNUCT STATUSMSG=@%+ EXCEPTS INVEX'
+		]
+		for option_txt in options_txt:
+			send_numeric(5, [user.nick], '%s %s :Are supported by this server' % (user.nick, option_txt), user)
+
+
+		#: Host
+		send_numeric(396, [user.nick], '%s :is now your displayed host' % user.hostname, user)
+
 		#: Stats
 		send_numeric(251, [user.nick], ':There is %s users on %s' % (len(DominoData.users), user.server.name), user)
 		send_numeric(252, [user.nick], ':There is %s channels on %s' % (len(DominoData.chans), user.server.name), user)

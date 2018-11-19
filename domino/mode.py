@@ -63,8 +63,8 @@ class ChanMode(object):
 		'h' : set()
 	}
 	symbols = {
-		'q' : '~',
-		'a' : '&',
+		'q' : '@',
+		'a' : '@',
 		'o' : '@',
 		'h' : '%',
 		'v' : '+'
