@@ -35,13 +35,19 @@ def QUIT(user, args):
 def NICK(user, args):
 	if len(args) != 1:
 		send_numeric(461, [user.nick, 'NICK'], ':Not enough parameters')
+		user.send(':%s PING %s :%s' % (user.server.name, user.server.name, ''))
+		return
 
 	if DominoData.users.get(args[0].lower()) != None and DominoData.users.get(args[0].lower()) != user:
 		send_numeric(433, ['*', args[0]], ':Nickname is already in use.', user)
+		user.send(':%s PING %s :%s' % (user.server.name, user.server.name, ''))
+		return
 
 	if not DominoData.re_nick.match(args[0]):
 		send_numeric(432, ['*', args[0]], ':Erroneous nickname.', user)
-	
+		user.send(':%s PING %s :%s' % (user.server.name, user.server.name, ''))
+		return
+
 	user.update_nick(args[0])
 
 def NOTICE(user, args):
